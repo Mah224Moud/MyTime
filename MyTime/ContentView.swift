@@ -97,7 +97,7 @@ struct CounterDetailView: View {
                     .multilineTextAlignment(.center)
             }
             
-            Text("⏳")
+            Text("⏳⏳⏳")
                 .font(.largeTitle)
                 .foregroundColor(.white)
                 .padding(.top, 40)
