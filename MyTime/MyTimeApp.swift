@@ -12,21 +12,16 @@ import SwiftData
 struct MyTimeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            EventItem.self, // Utilisation de la classe correcte
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
+        let container = try! ModelContainer(for: schema)
+        return container
     }()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .modelContainer(sharedModelContainer) // Injection du conteneur
         }
-        .modelContainer(sharedModelContainer)
     }
 }
