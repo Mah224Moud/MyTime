@@ -82,39 +82,58 @@ struct CounterDetailView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Depuis \(event.timestamp.formatted(date: .long, time: .shortened))")
-                .font(.title2)
-                .padding(.top, 20)
-
-            HStack {
-                Text("⏳")
+            VStack(spacing: 20) {
+                Text(event.name)
                     .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                Text("Depuis le")
+                    .font(.title)
+                    .foregroundColor(.white)
+                Text(event.timestamp.formatted(date: .long, time: .shortened))
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
             }
+            
+            Text("⏳")
+                .font(.largeTitle)
+                .foregroundColor(.white)
+                .padding(.top, 40)
+            
 
-            HStack(spacing: 40) {
-                timeBox(value: timeDifference().days, unit: "JOURS")
-                timeBox(value: timeDifference().hours, unit: "HEURES")
-                timeBox(value: timeDifference().minutes, unit: "MINUTES")
-                timeBox(value: timeDifference().seconds, unit: "SECONDES")
+            HStack(spacing: 20) {
+                timeBox(value: timeDifference().days, unit: "J")
+                    .frame(maxWidth: .infinity)
+                timeBox(value: timeDifference().hours, unit: "H")
+                    .frame(maxWidth: .infinity)
+                timeBox(value: timeDifference().minutes, unit: "M")
+                    .frame(maxWidth: .infinity)
+                timeBox(value: timeDifference().seconds, unit: "S")
+                    .frame(maxWidth: .infinity)
             }
+            .frame(maxWidth: .infinity)
             .padding(.vertical, 40)
+
 
             Button("Réinitialiser") {
                 currentTime = Date()
             }
             .font(.headline)
+            .foregroundColor(.white)
             .padding(.top, 20)
         }
         .onReceive(timer) { _ in
-            currentTime = Date() // Met à jour l'heure actuelle chaque seconde
+            currentTime = Date()
         }
+        .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
         .padding()
         .background(LinearGradient(gradient: Gradient(colors: [Color.pink, Color.orange]), startPoint: .top, endPoint: .bottom))
         .cornerRadius(20)
         .shadow(radius: 10)
         .padding()
     }
-
     private func timeDifference() -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
         let diff = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: event.timestamp, to: currentTime)
         return (days: abs(diff.day ?? 0), hours: abs(diff.hour ?? 0), minutes: abs(diff.minute ?? 0), seconds: abs(diff.second ?? 0))
@@ -135,7 +154,7 @@ struct AddItemView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name: String = ""
-    @State private var isPositive: Bool = true // Par défaut, compteur positif
+    @State private var isPositive: Bool = true
     @State private var selectedDate: Date = Date()
 
     var onAdd: (String, Date) -> Void
@@ -182,7 +201,7 @@ class EventItem {
     var name: String
     var timestamp: Date
 
-    // Initialiseur requis
+    
     init(id: UUID = UUID(), name: String, timestamp: Date) {
         self.id = id
         self.name = name
