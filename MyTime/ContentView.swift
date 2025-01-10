@@ -75,9 +75,9 @@ struct ContentView: View {
 }
 
 struct CounterDetailView: View {
-    let event: EventItem // L'événement à afficher
-
-    @State private var currentTime: Date = Date() // L'heure actuelle mise à jour en temps réel
+    @Environment(\.modelContext) private var modelContext
+    let event: EventItem
+    @State private var currentTime: Date = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -119,6 +119,9 @@ struct CounterDetailView: View {
 
             Button("Réinitialiser") {
                 currentTime = Date()
+                currentTime = Date()
+                event.timestamp = currentTime
+                try? modelContext.save()
             }
             .font(.headline)
             .foregroundColor(.white)
