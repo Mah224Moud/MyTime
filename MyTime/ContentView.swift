@@ -10,9 +10,9 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(items) { item in
+                ForEach(items.sorted(by: { $0.timestamp > $1.timestamp })) { item in
                     NavigationLink {
-                        CounterDetailView(event: item) // Utilisation de la nouvelle vue avec le compteur
+                        CounterDetailView(event: item)
                     } label: {
                         VStack(alignment: .leading) {
                             Text(item.name)
