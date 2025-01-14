@@ -102,63 +102,88 @@ struct CounterDetailView: View {
     @State private var currentTime: Date = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
+    // Nouveaux états
+    @State private var isEditing = false
+    @State private var showToastMessage: String? = nil
+
     var body: some View {
-        VStack(spacing: 20) {
+        ZStack {
             VStack(spacing: 20) {
-                Text(event.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
+                VStack(spacing: 20) {
+                    Text(event.name)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                    
+                    Text("Depuis le")
+                        .font(.title)
+                        .foregroundColor(.white)
+                    Text(event.timestamp.formatted(date: .long, time: .shortened))
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                }
                 
-                Text("Depuis le")
-                    .font(.title)
+                Text("⏳⏳⏳")
+                    .font(.largeTitle)
                     .foregroundColor(.white)
-                Text(event.timestamp.formatted(date: .long, time: .shortened))
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-            }
-            
-            Text("⏳⏳⏳")
-                .font(.largeTitle)
+                    .padding(.top, 40)
+                
+                HStack(spacing: 20) {
+                    timeBox(value: timeDifference().days, unit: "J")
+                        .frame(maxWidth: .infinity)
+                    timeBox(value: timeDifference().hours, unit: "H")
+                        .frame(maxWidth: .infinity)
+                    timeBox(value: timeDifference().minutes, unit: "M")
+                        .frame(maxWidth: .infinity)
+                    timeBox(value: timeDifference().seconds, unit: "S")
+                        .frame(maxWidth: .infinity)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 40)
+                
+                Button("Réinitialiser") {
+                    currentTime = Date()
+                    event.timestamp = currentTime
+                    try? modelContext.save()
+                    showToast(message: "Date réinitialisée")
+                }
+                .font(.headline)
                 .foregroundColor(.white)
-                .padding(.top, 40)
+                .padding(.top, 20)
+            }
+            .onReceive(timer) { _ in
+                currentTime = Date()
+            }
+            .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
+            .padding()
+            .background(LinearGradient(gradient: Gradient(colors: [Color.pink, Color.orange]), startPoint: .top, endPoint: .bottom))
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding()
             
-
-            HStack(spacing: 20) {
-                timeBox(value: timeDifference().days, unit: "J")
-                    .frame(maxWidth: .infinity)
-                timeBox(value: timeDifference().hours, unit: "H")
-                    .frame(maxWidth: .infinity)
-                timeBox(value: timeDifference().minutes, unit: "M")
-                    .frame(maxWidth: .infinity)
-                timeBox(value: timeDifference().seconds, unit: "S")
-                    .frame(maxWidth: .infinity)
+            // Toast
+            if let message = showToastMessage {
+                toastView(message: message)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 40)
-
-
-            Button("Réinitialiser") {
-                currentTime = Date()
-                currentTime = Date()
-                event.timestamp = currentTime
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Modifier") {
+                    isEditing.toggle()
+                }
+                .font(.headline)
+            }
+        }
+        .sheet(isPresented: $isEditing) {
+            EditEventView(event: event) { newName in
+                event.name = newName
                 try? modelContext.save()
+                showToast(message: "Nom modifié avec succès")
             }
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.top, 20)
         }
-        .onReceive(timer) { _ in
-            currentTime = Date()
-        }
-        .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
-        .padding()
-        .background(LinearGradient(gradient: Gradient(colors: [Color.pink, Color.orange]), startPoint: .top, endPoint: .bottom))
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .padding()
     }
+
     private func timeDifference() -> (days: Int, hours: Int, minutes: Int, seconds: Int) {
         let diff = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: event.timestamp, to: currentTime)
         return (days: abs(diff.day ?? 0), hours: abs(diff.hour ?? 0), minutes: abs(diff.minute ?? 0), seconds: abs(diff.second ?? 0))
@@ -171,6 +196,67 @@ struct CounterDetailView: View {
             Text(unit)
                 .font(.subheadline)
                 .fontWeight(.semibold)
+        }
+    }
+    
+    private func showToast(message: String) {
+        withAnimation {
+            showToastMessage = message
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                withAnimation {
+                    showToastMessage = nil
+                }
+            }
+        }
+    }
+
+    private func toastView(message: String) -> some View {
+        VStack {
+            Spacer()
+            Text(message)
+                .font(.subheadline)
+                .padding()
+                .background(Color.black.opacity(0.8))
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                .padding(.bottom, 20)
+        }
+        .transition(.move(edge: .bottom))
+    }
+}
+
+
+struct EditEventView: View {
+    @State private var newName: String
+    let event: EventItem
+    let onSave: (String) -> Void
+    @Environment(\.dismiss) var dismiss
+
+    init(event: EventItem, onSave: @escaping (String) -> Void) {
+        self.event = event
+        self.onSave = onSave
+        self._newName = State(initialValue: event.name)
+    }
+
+    var body: some View {
+        NavigationView {
+            Form {
+                TextField("Nom de l'événement", text: $newName)
+            }
+            .navigationTitle("Modifier l'événement")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Sauvegarder") {
+                        onSave(newName)
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Annuler") {
+                        dismiss()
+                    }
+                }
+            }
         }
     }
 }
@@ -211,6 +297,9 @@ struct AddItemView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Ajouter") {
                         let finalDate = isPositive ? Date() : selectedDate
+                        if name.isEmpty {
+                            name = "Non rensigné"
+                        }
                         onAdd(name, finalDate)
                         dismiss()
                     }
