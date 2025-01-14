@@ -62,15 +62,37 @@ struct ContentView: View {
 
     private func timeDifference(from date: Date) -> String {
         let now = Date()
-        let difference = Calendar.current.dateComponents([.day, .hour], from: now, to: date)
-        if let days = difference.day, let hours = difference.hour {
-            if date > now {
-                return "\(days) jours et \(hours) heures restants"
-            } else {
-                return "\(abs(days)) jours et \(abs(hours)) heures écoulés"
-            }
+        let difference = Calendar.current.dateComponents([.second, .minute, .hour, .day, .weekOfYear, .month, .year], from: date, to: now)
+
+        if let years = difference.year, years > 0 {
+            return years == 1 ? "il y a 1 an" : "il y a \(years) ans"
         }
-        return "Inconnu"
+
+        if let months = difference.month, months > 0 {
+            return months == 1 ? "il y a 1 mois" : "il y a \(months) mois"
+        }
+
+        if let weeks = difference.weekOfYear, weeks > 0 {
+            return weeks == 1 ? "il y a 1 semaine" : "il y a \(weeks) semaines"
+        }
+
+        if let days = difference.day, days > 0 {
+            return days == 1 ? "il y a 1 jour" : "il y a \(days) jours"
+        }
+
+        if let hours = difference.hour, hours > 0 {
+            return hours == 1 ? "il y a 1 heure" : "il y a \(hours) heures"
+        }
+
+        if let minutes = difference.minute, minutes > 0 {
+            return minutes == 1 ? "il y a 1 minute" : "il y a \(minutes) minutes"
+        }
+
+        if let seconds = difference.second, seconds > 0 {
+            return seconds == 1 ? "il y a 1 seconde" : "il y a \(seconds) secondes"
+        }
+
+        return "À l'instant"
     }
 }
 
