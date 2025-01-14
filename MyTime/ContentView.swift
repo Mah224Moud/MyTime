@@ -102,7 +102,6 @@ struct CounterDetailView: View {
     @State private var currentTime: Date = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    // Nouveaux états
     @State private var isEditing = false
     @State private var showToastMessage: String? = nil
 
@@ -146,7 +145,6 @@ struct CounterDetailView: View {
                     currentTime = Date()
                     event.timestamp = currentTime
                     try? modelContext.save()
-                    showToast(message: "Date réinitialisée")
                 }
                 .font(.headline)
                 .foregroundColor(.white)
@@ -161,11 +159,6 @@ struct CounterDetailView: View {
             .cornerRadius(20)
             .shadow(radius: 10)
             .padding()
-            
-            // Toast
-            if let message = showToastMessage {
-                toastView(message: message)
-            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -179,7 +172,6 @@ struct CounterDetailView: View {
             EditEventView(event: event) { newName in
                 event.name = newName
                 try? modelContext.save()
-                showToast(message: "Nom modifié avec succès")
             }
         }
     }
@@ -197,31 +189,6 @@ struct CounterDetailView: View {
                 .font(.subheadline)
                 .fontWeight(.semibold)
         }
-    }
-    
-    private func showToast(message: String) {
-        withAnimation {
-            showToastMessage = message
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
-                    showToastMessage = nil
-                }
-            }
-        }
-    }
-
-    private func toastView(message: String) -> some View {
-        VStack {
-            Spacer()
-            Text(message)
-                .font(.subheadline)
-                .padding()
-                .background(Color.black.opacity(0.8))
-                .foregroundColor(.white)
-                .cornerRadius(8)
-                .padding(.bottom, 20)
-        }
-        .transition(.move(edge: .bottom))
     }
 }
 
