@@ -128,14 +128,14 @@ struct CounterDetailView: View {
                     .foregroundColor(.white)
                     .padding(.top, 40)
                 
-                HStack(spacing: 20) {
-                    timeBox(value: timeDifference().days, unit: "J")
+                HStack(spacing: 10) {
+                    timeBox(value: timeDifference().days, unit: timeDifference().days > 1 ? "Jours" : "Jour")
                         .frame(maxWidth: .infinity)
-                    timeBox(value: timeDifference().hours, unit: "H")
+                    timeBox(value: timeDifference().hours, unit: timeDifference().hours > 1 ? "Heures" : "Heure")
                         .frame(maxWidth: .infinity)
-                    timeBox(value: timeDifference().minutes, unit: "M")
+                    timeBox(value: timeDifference().minutes, unit: timeDifference().minutes > 1 ? "Minutes" : "Minute")
                         .frame(maxWidth: .infinity)
-                    timeBox(value: timeDifference().seconds, unit: "S")
+                    timeBox(value: timeDifference().seconds, unit: timeDifference().seconds > 1 ? "Secondes" : "Seconde")
                         .frame(maxWidth: .infinity)
                 }
                 .frame(maxWidth: .infinity)
@@ -169,8 +169,10 @@ struct CounterDetailView: View {
             }
         }
         .sheet(isPresented: $isEditing) {
-            EditEventView(event: event) { newName in
+            EditEventView(event: event) { newName, newDate in
                 event.name = newName
+                event.timestamp = newDate
+                
                 try? modelContext.save()
             }
         }
@@ -184,10 +186,15 @@ struct CounterDetailView: View {
     private func timeBox(value: Int, unit: String) -> some View {
         VStack {
             Text("\(value)")
-                .font(.system(size: 48, weight: .bold, design: .rounded))
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: .infinity)
+                .lineLimit(1)
             Text(unit)
                 .font(.subheadline)
                 .fontWeight(.semibold)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
         }
     }
 }
@@ -195,26 +202,31 @@ struct CounterDetailView: View {
 
 struct EditEventView: View {
     @State private var newName: String
+    @State private var newDate: Date
     let event: EventItem
-    let onSave: (String) -> Void
+    let onSave: (String, Date) -> Void
     @Environment(\.dismiss) var dismiss
 
-    init(event: EventItem, onSave: @escaping (String) -> Void) {
+    init(event: EventItem, onSave: @escaping (String, Date) -> Void) {
         self.event = event
         self.onSave = onSave
         self._newName = State(initialValue: event.name)
+        self._newDate = State(initialValue: event.timestamp)
     }
 
     var body: some View {
         NavigationView {
             Form {
                 TextField("Nom de l'événement", text: $newName)
+                
+                DatePicker("Date de l'événement", selection: $newDate, displayedComponents: [.date, .hourAndMinute])
+                    .datePickerStyle(CompactDatePickerStyle())
             }
             .navigationTitle("Modifier l'événement")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Sauvegarder") {
-                        onSave(newName)
+                        onSave(newName, newDate)
                         dismiss()
                     }
                 }
