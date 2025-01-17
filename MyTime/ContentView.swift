@@ -25,6 +25,12 @@ struct ContentView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .refreshable {
+                try? modelContext.save()
+            }
+            .onAppear {
+                try? modelContext.save()
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
