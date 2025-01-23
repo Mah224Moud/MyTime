@@ -11,9 +11,7 @@ import SwiftData
 @main
 struct MyTimeApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            EventItem.self, // Utilisation de la classe correcte
-        ])
+        let schema = Schema([EventItem.self])
         let container = try! ModelContainer(for: schema)
         return container
     }()
@@ -21,7 +19,8 @@ struct MyTimeApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(sharedModelContainer) // Injection du conteneur
+                .modelContainer(sharedModelContainer)
+                .environment(\.locale, Locale(identifier: "fr"))
         }
     }
 }
