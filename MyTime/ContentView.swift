@@ -4,6 +4,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [EventItem]
+    @State private var refreshID = UUID()
 
     @State private var showAddForm = false
 
@@ -25,7 +26,9 @@ struct ContentView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .id(refreshID)
             .refreshable {
+                refreshID = UUID()
                 try? modelContext.save()
             }
             .onAppear {
