@@ -43,6 +43,7 @@ struct ContentView: View {
                         addButton
                     }
                 }
+                .preferredColorScheme(.light)
                 .sheet(isPresented: $showAddForm) {
                     AddItemView { name, date in
                         addItem(name: name, date: date)

@@ -11,7 +11,7 @@ struct Themes {
     // Définition centrale des dégradés
     static var mainViewTheme: LinearGradient {
         LinearGradient(
-            gradient: Gradient(colors: [.white, .yellow, .red]),
+            gradient: Gradient(colors: [.mint, .red, .indigo]),
             startPoint: .top,
             endPoint: .bottom
         )
@@ -19,7 +19,7 @@ struct Themes {
     
     static var formViewTheme: LinearGradient {
         LinearGradient(
-            gradient: Gradient(colors: [.white, .yellow, .red]),
+            gradient: Gradient(colors: [.mint, .red]),
             startPoint: .top,
             endPoint: .bottom
         )
