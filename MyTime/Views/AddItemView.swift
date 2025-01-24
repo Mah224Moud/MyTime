@@ -5,8 +5,8 @@
 //  Created by Mamoudou DIALLO on 23/01/2025.
 //
 import Foundation
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct AddItemView: View {
     @Environment(\.dismiss) private var dismiss
@@ -18,14 +18,7 @@ struct AddItemView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [.white, .yellow, .red]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
+            BackgroundView(gradient: Themes.formViewTheme) {
                 Form {
                     Section(header: Text("Détails de l'événement")) {
                         TextField("Nom", text: $name)
@@ -46,7 +39,6 @@ struct AddItemView: View {
                     }
                 }
                 .scrollContentBackground(.hidden)
-                .navigationTitle("Éditer l'événement")
                 .navigationTitle("Ajouter un événement")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {

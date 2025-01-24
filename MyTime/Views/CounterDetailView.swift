@@ -22,18 +22,14 @@ struct CounterDetailView: View {
     @State private var isEditing = false
     
     var body: some View {
-        ZStack {
-            LinearGradient(
-                gradient: Gradient(colors: [.white, .yellow, .red]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            mainContent
+        BackgroundView(gradient: Themes.mainViewTheme) {
+            ZStack {
+                
+                mainContent
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .onReceive(timer) { currentTime = $0 }
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .onReceive(timer) { currentTime = $0 }
     }
     
     // MARK: - Main Content

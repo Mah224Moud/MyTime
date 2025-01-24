@@ -26,32 +26,31 @@ struct EditEventView: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [.white, .yellow, .red]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
-                Form {
-                    Section("Modifier l'événement") {
-                        TextField("Nom", text: $newName)
-                        DatePicker(
-                            "Date et heure",
-                            selection: $newDate,
-                            displayedComponents: [.date, .hourAndMinute]
-                        )
+            BackgroundView(gradient: Themes.formViewTheme) {
+                ZStack {
+                    Form {
+                        Section("Modifier l'événement") {
+                            TextField("Nom", text: $newName)
+                                .foregroundColor(.black)
+                                .background(.white)
+                            DatePicker(
+                                "Date et heure",
+                                selection: $newDate,
+                                displayedComponents: [.date, .hourAndMinute]
+                            )
+                            .foregroundColor(.black)
+                            .background(.white)
+                        }
                     }
-                }
-                .scrollContentBackground(.hidden)
-                .navigationTitle("Éditer l'événement")
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        saveButton
-                    }
-                    ToolbarItem(placement: .cancellationAction) {
-                        cancelButton
+                    .scrollContentBackground(.hidden)
+                    .navigationTitle("Éditer l'événement")
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            saveButton
+                        }
+                        ToolbarItem(placement: .cancellationAction) {
+                            cancelButton
+                        }
                     }
                 }
             }

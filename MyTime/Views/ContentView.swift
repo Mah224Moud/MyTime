@@ -5,26 +5,20 @@
 //  Created by Mamoudou DIALLO on 23/01/2025.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \EventItem.timestamp, order: .reverse) private var items: [EventItem]
+    @Query(sort: \EventItem.timestamp, order: .reverse) private var items:
+    [EventItem]
     
     @State private var showAddForm = false
     @State private var refreshID = UUID()
     
     var body: some View {
         NavigationSplitView {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [.white, .yellow, .red]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
+            BackgroundView(gradient: Themes.mainViewTheme) {
                 List {
                     ForEach(items) { item in
                         NavigationLink {
@@ -41,29 +35,22 @@ struct ContentView: View {
                 .refreshable { refreshID = UUID() }
                 .navigationTitle("Mes Événements")
                 .navigationBarTitleDisplayMode(.large)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        EditButton()
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        addButton
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    addButton
-                }
-            }
-            .sheet(isPresented: $showAddForm) {
-                AddItemView { name, date in
-                    addItem(name: name, date: date)
+                .sheet(isPresented: $showAddForm) {
+                    AddItemView { name, date in
+                        addItem(name: name, date: date)
+                    }
                 }
             }
         } detail: {
-            ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [.pink, .orange]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-                
+            BackgroundView(gradient: Themes.formViewTheme) {
                 Text("Sélectionnez un événement")
                     .font(.largeTitle)
                     .foregroundColor(.white)
